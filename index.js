@@ -4,6 +4,8 @@ const mongoose = require('mongoose')
 require('dotenv').config();
 const Product = require('./models/product')
 const Review = require('./models/review')
+const Order = require('./models/order')
+const Admin = require('./models/admin')
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -78,28 +80,87 @@ app.get('/review', async (req, res) => {
   }
 })
 
-// Get logged user orders
-app.get('/orders', async (req, res) => {
-  const email = req.query.email
-  console.log(email)
-  const query = { email };
-  const cursor = Orders.findOne(query);
-  const orders = await cursor.toArray();
-  res.send(orders)
+app.post('/order', async (req, res) => {
+  const { productId, quantity, email, phone, address } = req.body
+  console.log(req.body)
+  try {
+    const newOrder = new Order({ productId, quantity, email, phone, address })
+    const result = await newOrder.save()
+    res.send(result)
+  }
+  catch (err) {
+    console.log(err)
+    res.status(400).send(err)
+  }
 })
 
-  //DELETE logged users items delete
-        // app.delete('/orders/:id/:email', async (req, res) => {
-        //     const id = req.params.id;
-        //     const email = req.params.email;
-        //     const query = { _id: ObjectId(id) };
-        //     const result = await itemsCollection.deleteOne(query);
-        //     const items = await itemsCollection.find({email});
-        //     console.log(result)
 
-        //     res.send(items);
+// Get logged user orders
+app.get('/order/:email', async (req, res) => {
+  const { email } = req.params
+  try {
+    const order = await Order.find({email}).populate('productId')
+   
+    res.send(order)
+  }
+  catch (err) {
+    console.log(err)
+    res.status(400).send(err)
+  }
+})
 
-        // })
+app.patch('/product/updateQuantity', async (req, res) => {
+  const { id, quantity } = req.body
+
+  try {
+    const updatedQuantityProduct = await Product.findById(id)
+    updatedQuantityProduct.availableQuantity = quantity
+    updatedQuantityProduct.save()
+    res.send(updatedQuantityProduct)
+  }
+  catch (err) {
+    console.log(err)
+    res.status(400).send(err)
+  }
+}
+)
+
+app.post('/makeAdmin',async (req, res)=> {
+
+  try{
+    const newAdmin =  Admin.create({email: req.body.email})
+    const result = await newAdmin.save()
+    res.send(result)
+  }
+  catch(err){
+    res.send(err)
+    
+  }
+})
+app.post('/isAdmin',async (req, res)=> {
+
+  try{
+    const newAdmin =  Admin.findOne({email: req.body.email})
+    res.send(newAdmin.email && {isAdmin: true})
+  }
+  catch(err){
+    res.send(err)
+  }
+})
+
+
+//DELETE logged users items delete
+// app.delete('/orders/:id/:email', async (req, res) => {
+//     const id = req.params.id;
+//     const email = req.params.email;
+//     const query = { _id: ObjectId(id) };
+//     const result = await itemsCollection.deleteOne(query);
+//     const items = await itemsCollection.find({email});
+//     console.log(result)
+
+//     res.send(items);
+
+// })
 
 // app.patch('/updatequantity/:id', async (req, res) => {
 //   const id = req.params.id;
@@ -186,12 +247,6 @@ app.get("/", (req, res) => res.send('Hello world'))
 
 //     }
 // }
-
-// run().catch(console.dir);
-
-// app.get('/', (req, res) => {
-//   res.send('Hello World!')
-// })
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)

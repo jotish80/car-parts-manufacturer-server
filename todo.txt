@@ -1,0 +1,14 @@
+==> Api documentation
+-> User
+   -> register new user
+   -> make admin
+-> product
+   -> add product
+   -> patch quantity
+   -> 
+-> order
+   -> post order
+   -> get orders by User email
+   -> patch order status
+   -> 
+-> 
