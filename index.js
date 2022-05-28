@@ -80,6 +80,21 @@ app.get('/review', async (req, res) => {
   }
 })
 
+app.post('/user', async (req, res) => {
+  console.log(req.body);
+  const { name, email, phoneNumber, education, location } = req.body;
+  try {
+    const newUser = User.create({ name, email, phoneNumber, education, location });
+    const result = await newUser.save();
+    console.log(newUser)
+    res.send(newUser);
+  }
+  catch (err) {
+    res.send(err);
+  }
+
+});
+
 app.post('/order', async (req, res) => {
   const { productId, quantity, email, phone, address } = req.body
   console.log(req.body)
@@ -148,105 +163,10 @@ app.post('/isAdmin',async (req, res)=> {
   }
 })
 
-
-//DELETE logged users items delete
-// app.delete('/orders/:id/:email', async (req, res) => {
-//     const id = req.params.id;
-//     const email = req.params.email;
-//     const query = { _id: ObjectId(id) };
-//     const result = await itemsCollection.deleteOne(query);
-//     const items = await itemsCollection.find({email});
-//     console.log(result)
-
-//     res.send(items);
-
-// })
-
-// app.patch('/updatequantity/:id', async (req, res) => {
-//   const id = req.params.id;
-//   Product.findOne({ _id: ObjectId(id) }).then(result => {
-//     Product.updateOne(
-//       { _id: ObjectId(id) },
-
-//       {
-//         $set: {
-//           quantity: Number(result.quantity) + Number(req.body.number)
-//         },
-//       }
-//     ).then(result => {
-//       console.log(result)
-//       res.send(result)
-//     })
-//   })
-// })
-
-
-
-
-
+ 
 app.get("/", (req, res) => res.send('Hello world'))
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
-
-
-// async function run(){
-//     try{
-//         await client.connect();
-//         const partsCollection = client.db('car-parts').collection('products');
-
-//         app.get('/products', async(req, res) =>{
-//             const query = {};
-//             const cursor = partsCollection.find(query);
-//             const parts =  await cursor.toArray();
-//             res.send(parts)
-//         })
-// // app.get('/item/:id', async (req, res) => {
-// //             const id = req.params.id;
-// //             const query = { _id: ObjectId(id) };
-// //             const item = await itemsCollection.findOne(query);
-// //             console.log(item)
-// //             res.send(item);
-// //         });
-
-
-
-//     }
-//     finally{
-
-//     }
-// }
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
